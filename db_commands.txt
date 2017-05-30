@@ -1,0 +1,43 @@
+{
+	"_id": {
+	  "$oid": "580fdbf89a5490001016eaec"
+	},
+	"userId": "123456789",
+	"createDate": 123456789,
+	"berries": []
+}
+
+Post user
+curl -H "Content-Type: application/json" -X POST -d '{"userId":"123456789", "berries":"[]"}' http://localhost:8080/api/users/
+
+Post user berry
+curl -H "Content-Type: application/json" -X POST -d '{"_id":"592c74cdbc10467c3a5045b2"}' http://localhost:8080/api/users/123456789/berries
+
+Get users
+curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X GET http://localhost:8080/api/users/
+
+Get berries by user
+curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X GET http://localhost:8080/api/users/?userId=123456789/berries
+
+{
+	"_id": {
+	 "$oid": "581675e2d9c57c0010d6f736"
+	},
+	"userId": "580da397705c29001043bd10",
+	"image": www.image.com,
+	"description": "description",
+	"createDate": "123456789",
+	"location": {
+	 "lat": 48.47004578553588,
+	 "lng": -123.3187735453248
+	}
+}
+
+Post berry
+curl -H "Content-Type: application/json" -X POST -d '{"userId":"123456789", "image":"", "description":"i am a description", "location":{"lat":"48", "lng":"-123"}}' http://localhost:8080/api/berries/
+
+Get berries
+curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X GET http://localhost:8080/api/berries/
+
+Get berry by id
+curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X GET http://localhost:8080/api/berries/592c74cdbc10467c3a5045b2

@@ -10,7 +10,21 @@ const USERS_COLLECTION = 'users';
 const router = new express.Router();
 
 module.exports = (db, auth) => {
-  router.use(auth);
+  //router.use(auth);
+
+  // {
+  //     "_id": {
+  //         "$oid": "581675e2d9c57c0010d6f736"
+  //     },
+  //     "userId": "580da397705c29001043bd10",
+  //     "image": www.image.com,
+  //     "description": "point of interest establishment ",
+  //     "createDate": "123456789",
+  //     "location": {
+  //         "lat": 48.47004578553588,
+  //         "lng": -123.3187735453248
+  //     }
+  // }
 
   /*
    * "/berry/"
@@ -42,10 +56,10 @@ module.exports = (db, auth) => {
     })
     .post((req, res) => {
       const newBerry = req.body;
-      newBerry.username = req.body.username || 'Unknown';
+      newBerry.userId = req.body.userId || 'Unknown';
       newBerry.image = req.body.image || 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Question_Mark.svg/2000px-Question_Mark.svg.png';
       newBerry.description = req.body.description || '';
-      newBerry.date = new Date();
+      newBerry.createDate = new Date().getTime();
       newBerry.location.lat = req.body.location.lat || '0.0';
       newBerry.location.lng = req.body.location.lng || '0.0';
 
