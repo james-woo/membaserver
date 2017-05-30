@@ -14,7 +14,7 @@ module.exports = (db, auth) => {
   //     "_id": {
   //         "$oid": "580fdbf89a5490001016eaec"
   //     },
-  //     "userId": "123456789",
+  //     "userId": "123456789"
   //     "createDate": 123456789,
   //     "berries": []
   //  }
@@ -49,7 +49,7 @@ module.exports = (db, auth) => {
 
   router.route('/:id/berries')
     .get((req, res) => {
-      db.collection(BERRIES_COLLECTION).find({ userId: new ObjectID(req.params.id) }).toArray((err, result) => {
+      db.collection(BERRIES_COLLECTION).find({ userId: req.params.id }).toArray((err, result) => {
         if (err) {
           utils.handleError(res, err.message, 'Failed to get user');
         } else {
@@ -63,7 +63,6 @@ module.exports = (db, auth) => {
         utils.handleError(res, 'berryId field not provided', 'Invalid format', 400);
         return;
       }
-
       db.collection(USERS_COLLECTION).updateOne({ _id: new ObjectID(req.params.id) }, { $addToSet: {'berries':berryId} }, (err, result) => {
         if (err) {
           utils.handleError(res, err.message, 'Failed to update myBerries');
@@ -77,18 +76,16 @@ module.exports = (db, auth) => {
       })
     });
 
-
   router.route('/token/:token')
     .get((req, res) => {
-      db.collection(USERS_COLLECTION).findOne({ token: parseInt(req.params.token, 10) },
-          (err, doc) => {
-            if (err) {
-              utils.handleError(res, err.message, 'Failed to authenticate user');
-              res.status(401).end();
-            } else {
-              res.status(200).json(doc);
-            }
-          });
+      db.collection(USERS_COLLECTION).findOne({ token: parseInt(req.params.token, 10) }, (err, doc) => {
+        if (err) {
+          utils.handleError(res, err.message, 'Failed to authenticate user');
+          res.status(401).end();
+        } else {
+          res.status(200).json(doc);
+        }
+      });
   	});
 
   return router;
