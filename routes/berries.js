@@ -46,11 +46,11 @@ module.exports = (db, auth) => {
         ],
       } : {};
 
-      db.collection(BERRIES_COLLECTION).find(area).toArray((err, result) => {
+      db.collection(BERRIES_COLLECTION).find(area).toArray((err, doc) => {
         if (err) {
           utils.handleError(res, err.message, 'Failed to get berries');
         } else {
-          res.status(200).json(result);
+          res.status(200).json(doc);
         }
       });
     })
@@ -63,11 +63,11 @@ module.exports = (db, auth) => {
       newBerry.location.lat = req.body.location.lat || '0.0';
       newBerry.location.lng = req.body.location.lng || '0.0';
 
-      db.collection(BERRIES_COLLECTION).insertOne(newBerry, (err, result) => {
+      db.collection(BERRIES_COLLECTION).insertOne(newBerry, (err, doc) => {
         if (err) {
           utils.handleError(res, err.message, 'Failed to create new berry.');
         } else {
-          res.status(201).json(result.ops[0]);
+          res.status(201).json(doc.ops[0]);
         }
       });
     });
@@ -79,11 +79,11 @@ module.exports = (db, auth) => {
 
    router.route('/:id')
     .get((req, res) => {
-      db.collection(BERRIES_COLLECTION).findOne({ _id: new ObjectID(req.params.id) }, (err, result) => {
+      db.collection(BERRIES_COLLECTION).findOne({ _id: new ObjectID(req.params.id) }, (err, doc) => {
         if (err) {
           utils.handleError(res, err.message, 'Failed to get berry');
         } else {
-          res.status(200).json(result);
+          res.status(200).json(doc);
         }
       });
     });

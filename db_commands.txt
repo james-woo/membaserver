@@ -41,3 +41,6 @@ curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X GET
 
 Get berry by id
 curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X GET http://localhost:8080/api/berries/592c74cdbc10467c3a5045b2
+
+
+[{"_id":"592c77b710462c045846a5cc","userId":"123456789","berries":["592c74cdbc10467c3a5045b2"],"createDate":1496086455866}]

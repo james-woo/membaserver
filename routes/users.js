@@ -26,11 +26,11 @@ module.exports = (db, auth) => {
    */
   router.route('/')
     .get((req,res) => {
-      db.collection(USERS_COLLECTION).find({}).toArray((err, result) => {
+      db.collection(USERS_COLLECTION).find({}).toArray((err, doc) => {
         if (err) {
           utils.handleError(res, err.message, 'Failed to get users.');
         } else {
-          res.status(200).json(result);
+          res.status(200).json(doc);
         }
       });
     })
@@ -38,22 +38,42 @@ module.exports = (db, auth) => {
       const newUser = req.body;
       newUser.berries = [];
       newUser.createDate = new Date().getTime();
-      db.collection(USERS_COLLECTION).insertOne(newUser, (err, result) => {
+      db.collection(USERS_COLLECTION).insertOne(newUser, (err, doc) => {
         if (err) {
           utils.handleError(res, err.message, 'Failed to create new user.');
         } else {
-          res.status(201).json(result.ops[0]);
+          res.status(201).json(doc.ops[0]);
         }
       });
   	});
 
+  /*
+   * "/users/"
+   * GET: get user by id
+   */
+  router.route('/:id')
+    .get((req,res) => {
+      db.collection(USERS_COLLECTION).findOne({ userId: req.params.id }, (err, doc) => {
+        if (err) {
+          utils.handleError(res, err.message, 'Failed to get users.');
+        } else {
+          if (!doc) {
+            const userId = req.params.id;
+            res.status(404).json(userId);
+            return;
+          }
+          res.status(200).json(doc).end();
+        }
+      });
+    });
+
   router.route('/:id/berries')
     .get((req, res) => {
-      db.collection(BERRIES_COLLECTION).find({ userId: req.params.id }).toArray((err, result) => {
+      db.collection(BERRIES_COLLECTION).find({ userId: req.params.id }).toArray((err, doc) => {
         if (err) {
           utils.handleError(res, err.message, 'Failed to get user');
         } else {
-          res.status(200).json(result);
+          res.status(200).json(doc);
         }
       });
     })
@@ -63,11 +83,11 @@ module.exports = (db, auth) => {
         utils.handleError(res, 'berryId field not provided', 'Invalid format', 400);
         return;
       }
-      db.collection(USERS_COLLECTION).updateOne({ _id: new ObjectID(req.params.id) }, { $addToSet: {'berries':berryId} }, (err, result) => {
+      db.collection(USERS_COLLECTION).updateOne({ _id: new ObjectID(req.params.id) }, { $addToSet: {'berries':berryId} }, (err, doc) => {
         if (err) {
           utils.handleError(res, err.message, 'Failed to update myBerries');
         } else {
-          if (!result) {
+          if (!doc) {
             utils.handleError(res, 'User id not found', 'Invalid user id', 400);
             return;
           }
