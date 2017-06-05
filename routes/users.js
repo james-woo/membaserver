@@ -14,7 +14,8 @@ module.exports = (db, auth) => {
   //     "_id": {
   //         "$oid": "580fdbf89a5490001016eaec"
   //     },
-  //     "userId": "123456789"
+  //     "userId": "123456789",
+  //     "userName": "username"
   //     "createDate": 123456789,
   //     "berries": []
   //  }
@@ -65,6 +66,31 @@ module.exports = (db, auth) => {
           res.status(200).json(doc).end();
         }
       });
+    })
+    .put((req, res) => {
+      const newUsername = req.body.userName;
+      db.collection(USERS_COLLECTION).updateOne({ userId: req.params.id }, {$set: {'userName':newUsername}}, (err, doc) => {
+        if (err) {
+          utils.handleError(res, err.message, 'Failed to update user');
+        } else {
+          if (!doc) {
+            utils.handleError(res, 'User id not found', 'Invalid user id', 400);
+            return;
+          }
+          res.status(204).end();
+        }
+      });
+      db.collection(BERRIES_COLLECTION).update({ userId: req.params.id }, {$set: {'userName':newUsername}}, { multi: true }, (err, doc) => {
+        if (err) {
+          utils.handleError(res, err.message, 'Failed to update berry');
+        } else {
+          if (!doc) {
+            utils.handleError(res, 'User id not found', 'Invalid user id', 400);
+            return;
+          }
+          res.status(204).end();
+        }
+      });
     });
 
   router.route('/:id/berries')
@@ -83,7 +109,7 @@ module.exports = (db, auth) => {
         utils.handleError(res, 'berryId field not provided', 'Invalid format', 400);
         return;
       }
-      db.collection(USERS_COLLECTION).updateOne({ _id: new ObjectID(req.params.id) }, { $addToSet: {'berries':berryId} }, (err, doc) => {
+      db.collection(USERS_COLLECTION).updateOne({ userId: req.params.id }, { $addToSet: {'berries':berryId} }, (err, doc) => {
         if (err) {
           utils.handleError(res, err.message, 'Failed to update myBerries');
         } else {
@@ -93,7 +119,7 @@ module.exports = (db, auth) => {
           }
           res.status(204).end();
         }
-      })
+      });
     });
 
   router.route('/token/:token')

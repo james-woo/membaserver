@@ -17,9 +17,24 @@ module.exports = (db, auth) => {
   //         "$oid": "581675e2d9c57c0010d6f736"
   //     },
   //     "userId": "580da397705c29001043bd10",
-  //     "image": www.image.com,
-  //     "description": "point of interest establishment ",
+  //     "userName": "username",
+  //     "entries": [
+  //         {"title":"May 25, 2017","date":"123456789", "image":"www.image.com", "text":"blah"},
+  //         {"title":"May 25, 2017","date":"123456789", "image":"www.image.com", "text":"blah"}
+  //     ],
   //     "createDate": "123456789",
+  //     "updateDate": "123456789",
+  //     "location": {
+  //         "lat": 48.47004578553588,
+  //         "lng": -123.3187735453248
+  //     }
+  // }
+
+  // Compressed
+  // {
+  //     "_id": {
+  //         "$oid": "581675e2d9c57c0010d6f736"
+  //     },
   //     "location": {
   //         "lat": 48.47004578553588,
   //         "lng": -123.3187735453248
@@ -50,6 +65,11 @@ module.exports = (db, auth) => {
         if (err) {
           utils.handleError(res, err.message, 'Failed to get berries');
         } else {
+          delete doc.userId;
+          delete doc.userName;
+          delete doc.entries;
+          delete doc.createDate;
+          delete doc.updateDate;
           res.status(200).json(doc);
         }
       });
@@ -57,9 +77,10 @@ module.exports = (db, auth) => {
     .post((req, res) => {
       const newBerry = req.body;
       newBerry.userId = req.body.userId || 'Unknown';
-      newBerry.image = req.body.image || 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Question_Mark.svg/2000px-Question_Mark.svg.png';
-      newBerry.description = req.body.description || '';
+      newBerry.userName = req.body.userName || 'Unknown';
+      newBerry.entries = req.body.entries || [];
       newBerry.createDate = new Date().getTime();
+      newBerry.updateDate = new Date().getTime();
       newBerry.location.lat = req.body.location.lat || '0.0';
       newBerry.location.lng = req.body.location.lng || '0.0';
 
@@ -86,6 +107,16 @@ module.exports = (db, auth) => {
           res.status(200).json(doc);
         }
       });
+    })
+    .put((req, res) => {
+      const newEntry = req.body;
+      db.collection(BERRIES_COLLECTION).update({ _id: new ObjectID(req.params.id) }, { $addToSet: {'entries':newEntry}, $set: {'updateDate':new Date().getTime()} }, (err, doc) => {
+        if (err) {
+          utils.handleError(res, err.message, 'Failed to create new entry.');
+        } else {
+          res.status(204).end();
+        }
+      })
     });
 
     return router;
